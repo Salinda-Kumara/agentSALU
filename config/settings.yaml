@@ -1,0 +1,46 @@
+# SALU configuration. No secrets in this file — use .env / environment variables.
+# Environment overrides: SALU_CLAUDE_AUTH_MODE, SALU_CLAUDE_MODEL, SALU_CLAUDE_CLI_PATH,
+# SALU_PORT, SALU_LOG_LEVEL.
+
+assistant:
+  name: SALU
+  user_name: ""            # how SALU addresses you, e.g. "Salinda" (optional)
+
+claude:
+  # subscription: use your Claude Code login (Pro/Max). No API billing.
+  # api_key:      use ANTHROPIC_API_KEY (separate API billing). Explicit opt-in only.
+  auth_mode: subscription
+  model: sonnet            # alias or full model id; null = account default
+  cli_path: null           # null = auto-detect (PATH, ~/.local/bin, VS Code extension)
+  max_turns: 20            # max agent steps per request
+  request_timeout_seconds: 300
+
+server:
+  host: 127.0.0.1          # SALU only listens locally. Do not expose it to a network.
+  port: 8765
+  open_window: true        # open the desktop window (Edge/Chrome app mode) on start
+
+security:
+  # Risk levels that run without asking. HIGH can never be auto-approved
+  # (enforced in code, regardless of this setting).
+  auto_approve: [low]
+  approval_timeout_seconds: 120   # unanswered confirmation => denied
+  # Raise (never lower) the risk of specific tools, e.g. read_text_file: medium
+  risk_overrides: {}
+  # Tools that are completely disabled.
+  disabled_tools: []
+
+tools:
+  # Folders the file tools may access. Empty = your home folder.
+  allowed_roots: []
+  # Extra tool plugin folders (trusted code only — plugins run inside SALU).
+  plugin_dirs: [plugins]
+
+memory:
+  database: data/salu.db
+
+logging:
+  level: INFO
+  file: logs/salu.log
+  max_bytes: 2000000
+  backup_count: 5

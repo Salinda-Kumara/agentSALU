@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SALU</title>
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Boot sequence: driven by the server's real startup checks -->
+  <div id="boot" class="boot">
+    <div class="boot-inner">
+      <div class="wordmark">S A L U</div>
+      <div class="boot-sub">Personal AI Assistant</div>
+      <div id="boot-status" class="boot-status"><span class="dot pulse"></span> Initializing…</div>
+      <ul id="boot-checks" class="boot-checks"></ul>
+      <div id="boot-result" class="boot-result"></div>
+      <button id="boot-continue" class="btn ghost hidden">Continue</button>
+    </div>
+  </div>
+
+  <div class="shell">
+    <nav class="rail">
+      <div class="rail-logo" title="SALU">
+        <svg viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"/><circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="2.5" fill="currentColor"/></svg>
+      </div>
+      <button class="rail-btn active" data-view="chat" title="Chat">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg><span>Chat</span></button>
+      <button class="rail-btn" data-view="tasks" title="Task history">
+        <svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg><span>Tasks</span></button>
+      <button class="rail-btn" data-view="memory" title="Memory">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg><span>Memory</span></button>
+      <button class="rail-btn" data-view="tools" title="Tools">
+        <svg viewBox="0 0 24 24"><path d="M14 6a4 4 0 0 0 5 5l-8 8a2 2 0 0 1-3-3l8-8a4 4 0 0 0-2-2z"/></svg><span>Tools</span></button>
+      <button class="rail-btn" data-view="logs" title="Logs">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 9l3 3-3 3M13 15h4"/></svg><span>Logs</span></button>
+      <button class="rail-btn" data-view="settings" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Settings</span></button>
+    </nav>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="brand"><span class="wordmark small">S A L U</span><span class="brand-sub">PERSONAL AI ASSISTANT</span></div>
+        <div id="sys-pill" class="pill"><span class="dot"></span><span id="sys-pill-text">CONNECTING</span></div>
+      </header>
+
+      <!-- CHAT -->
+      <section id="view-chat" class="view active">
+        <div id="transcript" class="transcript">
+          <div id="welcome" class="welcome">
+            <div class="orb"><span></span></div>
+            <div id="greeting" class="greeting">How can I assist you?</div>
+            <div class="suggestions">
+              <button class="chip" data-prompt="Check my computer.">Check my computer</button>
+              <button class="chip" data-prompt="What can you do right now?">What can you do?</button>
+              <button class="chip" data-prompt="What's in my Documents folder?">Browse Documents</button>
+            </div>
+          </div>
+        </div>
+        <form id="composer" class="composer" autocomplete="off">
+          <textarea id="input" rows="1" placeholder="Ask SALU…" maxlength="20000"></textarea>
+          <button type="button" id="mic" class="icon-btn" disabled title="Voice arrives in Phase 6">
+            <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button type="button" id="stop" class="icon-btn danger hidden" title="Stop">
+            <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+          <button type="submit" id="send" class="icon-btn accent" title="Send (Enter)">
+            <svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </section>
+
+      <section id="view-tasks" class="view"><h2>Task history</h2><div id="tasks-list" class="table-list"></div></section>
+      <section id="view-memory" class="view"><h2>Memory</h2>
+        <p class="muted">Non-secret facts SALU keeps between sessions. Secrets are refused by design.</p>
+        <div id="memory-list" class="table-list"></div></section>
+      <section id="view-tools" class="view"><h2>Tool registry</h2><div id="tools-list" class="table-list"></div></section>
+      <section id="view-logs" class="view"><h2>Logs <button id="logs-refresh" class="btn ghost sm">Refresh</button></h2><pre id="logs-box" class="logs"></pre></section>
+      <section id="view-settings" class="view"><h2>Settings</h2>
+        <p class="muted">Edit <code>config/settings.yaml</code> and <code>.env</code>, then restart SALU. Secrets are never shown here.</p>
+        <pre id="settings-box" class="logs"></pre></section>
+    </main>
+
+    <aside class="side">
+      <div class="card">
+        <div class="card-title">System</div>
+        <div class="meter"><label>CPU</label><div class="bar"><i id="cpu-bar"></i></div><span id="cpu-val">–</span></div>
+        <div class="meter"><label>RAM</label><div class="bar"><i id="ram-bar"></i></div><span id="ram-val">–</span></div>
+        <div class="meter net"><label>NET</label><span id="net-val" class="net-val">–</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Agent</div>
+        <div class="agent-state"><span id="agent-dot" class="dot"></span><span id="agent-state">idle</span></div>
+        <div class="card-sub">Current task</div>
+        <div id="current-task" class="current-task muted">None</div>
+        <div id="brain-info" class="brain-info"></div>
+      </div>
+      <div class="card grow">
+        <div class="card-title">Recent tasks</div>
+        <ul id="recent-tasks" class="recent"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Confirmation dialog -->
+  <div id="confirm" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-box">
+      <div class="modal-head"><span id="confirm-risk" class="risk">MEDIUM</span><span id="confirm-title">SALU CONFIRMATION</span></div>
+      <div id="confirm-summary" class="modal-summary"></div>
+      <div class="modal-label">Tool</div><div id="confirm-tool" class="mono"></div>
+      <div class="modal-label">Actions</div><ul id="confirm-details" class="modal-details"></ul>
+      <div class="modal-timer"><i id="confirm-timer"></i></div>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="btn ghost">Cancel</button>
+        <button id="confirm-proceed" class="btn primary">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
