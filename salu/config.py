@@ -53,6 +53,14 @@ class ToolsConfig:
 
 
 @dataclass
+class BrowserConfig:
+    channel: str = "msedge"          # installed browser Playwright drives: msedge | chrome | chromium
+    headless: bool = False           # visible by default so you can watch and take over
+    profile_dir: str = "data/browser-profile"   # SALU's own profile — separate from your normal browser
+    downloads_dir: str = "~/Downloads/SALU"
+
+
+@dataclass
 class LoggingConfig:
     level: str = "INFO"
     file: str = "logs/salu.log"
@@ -70,6 +78,7 @@ class Settings:
     tools: ToolsConfig = field(default_factory=ToolsConfig)
     memory_database: str = "data/salu.db"
     logging: LoggingConfig = field(default_factory=LoggingConfig)
+    browser: BrowserConfig = field(default_factory=BrowserConfig)
     root: Path = PROJECT_ROOT
 
     def path(self, p: str) -> Path:
@@ -91,6 +100,7 @@ class Settings:
             "tools": {"allowed_roots": [str(p) for p in self.allowed_roots()],
                       "plugin_dirs": self.tools.plugin_dirs},
             "memory": {"database": self.memory_database},
+            "browser": vars(self.browser),
             "logging": vars(self.logging),
         }
 
@@ -134,6 +144,7 @@ def load_settings(config_file: Path | None = None, env_file: Path | None = None,
         tools=_build(ToolsConfig, _section(data, "tools"), "tools"),
         memory_database=str(_section(data, "memory").get("database") or "data/salu.db"),
         logging=_build(LoggingConfig, _section(data, "logging"), "logging"),
+        browser=_build(BrowserConfig, _section(data, "browser"), "browser"),
         root=root,
     )
 
@@ -158,6 +169,8 @@ def validate(s: Settings) -> None:
         raise ConfigError(f"claude.auth_mode must be one of {AUTH_MODES}, got {s.claude.auth_mode!r}")
     if s.server.host not in ("127.0.0.1", "localhost", "::1"):
         raise ConfigError("server.host must be a loopback address; SALU must not be exposed to the network")
+    if s.browser.channel not in ("msedge", "chrome", "chromium"):
+        raise ConfigError("browser.channel must be msedge, chrome or chromium")
     levels = {"low", "medium", "high"}
     bad = set(s.security.auto_approve) - levels
     if bad:

@@ -3,7 +3,7 @@
 Access is limited to `tools.allowed_roots` (default: your home folder) and
 credential locations are always blocked (.ssh, .env, key files, Claude
 credentials, ...). Writing is MEDIUM risk; overwriting an existing file is HIGH.
-There is deliberately no delete tool in Phase 1.
+More file management (copy/move/recycle/zip) lives in file_ops.py.
 """
 
 from __future__ import annotations

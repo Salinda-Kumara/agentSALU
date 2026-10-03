@@ -168,6 +168,11 @@ function handleEvent(ev) {
       el.querySelector(".spin")?.remove();
       el.querySelector(".tstate").textContent = ev.ok ? `✓ ${ev.duration}s` : `✗ ${ev.stage === "denied" ? "not approved" : "failed"}`;
       const pre = document.createElement("pre"); pre.textContent = ev.output || "(no output)"; el.appendChild(pre);
+      for (const src of ev.images || []) {
+        if (!String(src).startsWith("data:image/")) continue;
+        const img = document.createElement("img"); img.className = "shot"; img.src = src; img.alt = "Screenshot";
+        el.appendChild(img); el.open = true;
+      }
       if (!ev.ok) el.open = true;
       scrollDown();
       break;

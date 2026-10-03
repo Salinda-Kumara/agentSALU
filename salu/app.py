@@ -9,6 +9,8 @@ from dataclasses import asdict, dataclass
 from . import __version__
 from .agent import Agent
 from .brain import Brain, create_brain
+from .browser import browser
+from .browser.manager import find_browser_executable
 from .config import Settings, load_settings
 from .logging_setup import setup_logging
 from .memory import MemoryStore
@@ -42,6 +44,7 @@ class SaluApp:
         self.broker = ApprovalBroker(s.security.approval_timeout_seconds)
         self.brain: Brain = brain or create_brain(s)
         self.agent = Agent(s, self.brain, self.registry, self.policy, self.broker, self.memory)
+        browser.configure(s)
         self.checks: list[Check] = []
         self.brain_info: dict = {}
         self.online = False
@@ -106,7 +109,19 @@ class SaluApp:
         await run("Agent runtime", agent_runtime)
         await run("Claude connection", claude)
         await run("Tool registry", tools)
+        async def browser_check():
+            try:
+                import playwright  # noqa: F401
+            except ImportError:
+                return False, "Playwright not installed (pip install playwright)"
+            exe = find_browser_executable(self.settings.browser.channel)
+            if not exe:
+                return False, f"{self.settings.browser.channel} not found; set browser.channel in settings.yaml"
+            mode = "headless" if self.settings.browser.headless else "visible"
+            return True, f"Playwright ready · {self.settings.browser.channel} ({mode}, starts on first use)"
+
         await run("Memory", memory)
+        await run("Browser", browser_check)
         await run("Security system", security)
         self.checks = checks
         self.online = all(c.ok for c in checks)
@@ -115,5 +130,6 @@ class SaluApp:
 
     async def shutdown(self) -> None:
         await self.agent.shutdown()
+        await browser.close()
         self.memory.close()
         log.info("SALU stopped")

@@ -115,7 +115,7 @@ def test_api_requires_token(web):
     client, _, _ = web
     assert client.get("/api/state").status_code == 401
     r = client.get("/api/state", headers={"X-Salu-Token": "tok123"})
-    assert r.status_code == 200 and len(r.json()["checks"]) == 5
+    assert r.status_code == 200 and len(r.json()["checks"]) == 6
     assert client.get("/").status_code == 200
 
 

@@ -99,5 +99,6 @@ class ToolExecutor:
         log.log(level, "Tool %s: %s stage=%s duration=%.2fs%s", "completed" if result.ok else "failed",
                 name, stage, seconds, "" if result.ok else f" error={result.output[:300]!r}")
         await self.events("tool_result", {"tool": name, "ok": result.ok, "stage": stage,
-                                          "duration": round(seconds, 2), "output": result.output[:2000]})
+                                          "duration": round(seconds, 2), "output": result.output[:2000],
+                                          "images": [i["thumb"] for i in (result.images or []) if i.get("thumb")]})
         return result

@@ -90,6 +90,7 @@ code, .mono { font-family: var(--mono); font-size: 12.5px; }
 .toolcard .tname { font-family: var(--mono); color: var(--text); }
 .toolcard .tstate { margin-left: auto; color: var(--muted); font-family: var(--mono); font-size: 11.5px; }
 .toolcard pre { margin: 0; padding: 10px 12px; border-top: 1px solid var(--line); max-height: 260px; overflow: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted); white-space: pre-wrap; }
+.toolcard img.shot { display: block; max-width: 100%; border-top: 1px solid var(--line); }
 .toolcard.ok .tstate { color: var(--ok); }
 .toolcard.fail .tstate { color: var(--bad); }
 .spin { width: 12px; height: 12px; border: 2px solid var(--line-2); border-top-color: var(--accent); border-radius: 50%; animation: rot .8s linear infinite; flex: none; }

@@ -39,6 +39,12 @@ tools:
 memory:
   database: data/salu.db
 
+browser:
+  channel: msedge          # msedge | chrome | chromium (chromium needs: python -m playwright install chromium)
+  headless: false          # show the browser window so you can watch / take over
+  profile_dir: data/browser-profile   # SALU's own profile, separate from your everyday browser
+  downloads_dir: ~/Downloads/SALU
+
 logging:
   level: INFO
   file: logs/salu.log

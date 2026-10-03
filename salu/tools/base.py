@@ -27,10 +27,12 @@ class ToolResult:
     ok: bool
     output: str
     data: dict[str, Any] | None = None
+    # Images for the model: [{"data": <base64>, "mime": "image/jpeg", "thumb": <data-URL for the UI>}]
+    images: list[dict[str, str]] | None = None
 
     @classmethod
-    def success(cls, output: str, data: dict | None = None) -> "ToolResult":
-        return cls(True, output, data)
+    def success(cls, output: str, data: dict | None = None, images: list[dict] | None = None) -> "ToolResult":
+        return cls(True, output, data, images)
 
     @classmethod
     def failure(cls, output: str, data: dict | None = None) -> "ToolResult":

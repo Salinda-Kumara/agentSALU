@@ -44,12 +44,15 @@ def build_mcp_server(registry: ToolRegistry, executor: ToolExecutor):
             async def handler(args: dict[str, Any]) -> dict[str, Any]:
                 result = await executor.execute(name, args)
                 payload: dict[str, Any] = {"content": [{"type": "text", "text": result.output or "(no output)"}]}
+                for img in result.images or []:
+                    if img.get("data"):
+                        payload["content"].append({"type": "image", "data": img["data"], "mimeType": img["mime"]})
                 if not result.ok:
                     payload["is_error"] = True
                 return payload
             return handler
 
-        desc = f"{t.description} [risk: {t.risk.label}]"
+        desc = f"{t.description} [risk: {t.risk.label}{', higher depending on input' if t.risk_fn else ''}]"
         sdk_tools.append(tool(t.name, desc, t.input_schema)(make_handler(t.name)))
     return create_sdk_mcp_server(name=MCP_SERVER, version="1.0.0", tools=sdk_tools)
 
